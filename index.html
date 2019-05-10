@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Stylish" rel="stylesheet">
+		<meta charset="utf-8">
+		<title>Archdaily</title><!-- make your own with https://www.favicon.cc/-->
+     <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+	 <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+		<style type="text/css">
+            body{font-family:helvetica;}
+				  		#Houses {
+							font-family:helvetica;
+									 font-size:14px;
+									 color:#ffffff;
+									 text-align:center;
+									 padding:15px;
+									 background-color:#999999;
+									 width:90px;
+									 height:10px;
+									 border-radius:40px;
+									 letter-spacing:2px;
+									 cursor:pointer;
+									 border-color:#000000;
+									 border:5px solid;
+								 }
+
+								 #Offices{
+									 font-family:helvetica;
+												font-size:14px;
+												color:#ffffff;
+												text-align:center;
+												padding:15px;
+												background-color:#999999;
+												width:90px;
+												height:10px;
+												border-radius:40px;
+												letter-spacing:2px;
+												cursor:pointer;
+												border-color:#000000;
+												border:5px solid;
+											}
+						  	#Apartments{
+												font-family:helvetica;
+														 font-size:14px;
+														 color:#ffffff;
+														 text-align:center;
+														 padding:15px;
+														 background-color:#999999;
+														 width:90px;
+														 height:10px;
+														 border-radius:40px;
+														 letter-spacing:2px;
+														 cursor:pointer;
+														 border-color:#000000;
+														 border:5px solid;
+													 }
+			    		 #Renovation{
+																	 font-family:helvetica;
+																				font-size:14px;
+																				color:#ffffff;
+																				text-align:center;
+																				padding:15px;
+																				background-color:#999999;
+																				width:90px;
+																				height:10px;
+																				border-radius:40px;
+																				letter-spacing:2px;
+																				cursor:pointer;
+																				border-color:#000000;
+																				border:5px solid;
+																			}
+							#Museum{
+									 																			 font-family:helvetica;
+									 																						font-size:14px;
+									 																						color:#ffffff;
+									 																						text-align:center;
+									 																						padding:15px;
+									 																						background-color:#999999;
+									 																						width:90px;
+									 																						height:10px;
+									 																						border-radius:40px;
+									 																						letter-spacing:2px;
+									 																						cursor:pointer;
+																															border-color:#000000;
+																															border:5px solid;
+									 																					}
+							#Others{
+																									 														 font-family:helvetica;
+																									 																	font-size:14px;
+																									 																	color:#ffffff;
+																									 																	text-align:center;
+																									 																	padding:15px;
+																									 																	background-color:#999999;
+																									 																	width:90px;
+																									 																	height:10px;
+																									 																	border-radius:40px;
+																									 																	letter-spacing:2px;
+																									 																	cursor:pointer;
+																																										border-color:#000000;
+																																										border:5px solid;
+																									 																}
+
+
+            #barchart{
+							width: 1300px;
+							height: 550px;
+							border-radius: 10px;
+							margin: auto;
+							background-color: #003333;
+							/* background-color: rgb(200, 200, 169); */
+							padding: 20px;
+						}
+
+						rect:hover {
+							fill: black;
+						}
+
+
+
+						#tooltip {
+							position: absolute;
+							width: 300px;
+							height: auto;
+							padding: 10px;
+							-webkit-border-radius: 10px;
+							-moz-border-radius: 10px;
+							border-radius: 10px;
+							-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+							-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+							box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+							pointer-events: none;
+						}
+
+						#tooltip.hidden {
+							display: none;
+						}
+
+						#tooltip p {
+							margin: 0;
+							font-family: sans-serif;
+							font-size: 13px;
+							line-height: 16px;
+						}
+
+
+						#legend3 {
+						    margin-right:30px;
+						}
+
+						.wood { background: #1F77B4;}
+						.concrete { background: #FF7F0E;}
+						.glass { background: #2CA02C;
+						}
+		</style>
+	</head>
+	  <div id="barchart"></div>
+		 <div id="barchart2"></div>
+	  <div id ="Houses">Houses</div>
+		<div id ="Offices">Offices</div>
+		<div id ="Apartments">Apartments</div>
+		<div id ="Renovation">Renovation</div>
+		<div id ="Museum">Museum</div>
+		<div id ="Others">Others</div>
+		<div id ="moreInfo"></div>
+	<body>
+		<div id="tooltip" class="hidden">
+			<p><strong></strong></p>
+			<p><span id="image"></span></p>
+		</div>
+
+
+
+
+	<script type="text/javascript">
+
+//create legend
+
+
+		var margin = {top: 100, bottom: 80, left: 60, right: 40}
+		var w1=1300
+		var h1=3500
+		var w = 1300 - margin.left - margin.right
+		var h = 3500 - margin.top - margin.bottom
+
+		var svg = d3.select("#barchart")
+		            .append("svg")
+								.attr("width", w + margin.left + margin.right)
+								.attr("height", h + margin.top + margin.bottom)
+								.append("g")
+								.attr("transform", "translate("+ margin.left +", "+ margin.top +")");
+
+            d3.csv("Archdaily_Clean_0425.csv")
+            .then(function(data){
+
+
+
+	  	  	var dataByYear = d3.nest()
+	  	  	  .key(function(d) { return d.Year; })
+	  	  	  .entries(data);
+                console.log(dataByYear)
+
+			  for(var i in dataByYear){
+				  // console.log(i)
+				  drawChart1(dataByYear[i],i)
+
+			  }
+            })
+           // .catch(function(error){console.log("error")})
+
+					 var colorByProduct = {
+			 			Concrete:"#FF8A47",
+			 			ConcreteHybrid:"#F15839",
+			 			Wood:"#FC6170",
+			 			WoodHybrid: "#ff9999",
+			 			Glass:"#8CEEEE",
+			 			GlassHybrid:"#26bfbf",
+			 			Brick:"#FFD747",
+			 			Plastic:"#cc3333",
+			 			Steel:"#62BD96",
+			 			SteelHybrid:"#00ff99",
+			 			Stone:"#FFFDA2",
+			 			StoneHybrid:"#ffff00",
+
+			 		}
+
+	function drawChart1(data,order){
+		// console.log(data)
+
+		//var year1 = data[0]
+		//console.log(year1)
+		//var subgroups = data.columns.slice(1)
+		//var groups = d3.map(data, function(d){return(d.Title)}).keys()
+
+		// create x axis
+		var xScale = d3.scaleBand()
+		               .domain([0,data.values.length])
+									 .range([0, w])
+									 .padding([0.4])
+
+		// create y axis
+		var yScale = d3.scaleBand()
+		               .domain([2012,2011,2010,2009,2008])
+					         .range([(h-1600)/5, 0])
+
+
+		svg.append("g")
+	  		.call(d3.axisLeft(yScale))
+	  		 .style("color", "white")
+
+
+		svg.append("g")
+			.selectAll("g")
+			.data(data.values)
+			.enter()
+			.append("g")
+			.attr("fill", function(d){
+				//console.log(d.Product, colorByProduct[d.Product])
+				return colorByProduct[d.Product]
+
+			})
+			.append("rect")
+			.attr("architects",function(d,i){
+				return d.Architects
+			})
+			.attr("class",function(d){
+				// console.log(d)
+                //NEW: For question 2 I gave the top rectangles a second class called topchart, now in the selectall, I use just that class to get the top rectangles.
+				return d.Category+" topChart"})
+			.attr("x",function(d,i){
+				return i*w/data.values.length;
+			})
+			.attr("y",10+order*70)
+			.attr("width",w/data.values.length)
+			.attr("height",40)
+			.on("click",function(d){
+				// console.log(d3.select(this).attr("class"))
+				d3.selectAll(".connect").remove()
+
+				var currentArchitect = d3.select(this).attr("architects")
+				var ox =d3.select(this).attr("x")
+				var oy = d3.select(this).attr("y")
+				//console.log(currentArchitect)
+				d3.selectAll(".topChart")
+				.attr("fill",function(d){
+					//console.log(d.Architects)
+					if(d.Architects == currentArchitect){
+					var endPoints= [
+						{x:ox,y:oy},
+						{x:d3.select(this).attr("x"),y:d3.select(this).attr("y")}
+					]
+
+					var line = d3.line()
+					.x(function(d){return d.x})
+					.y(function(d){return d.y})
+
+					svg.append("path")
+					.data([endPoints])
+					.attr("class","connect")
+					.attr("stroke","black")
+					.attr("fill","none")
+					.attr("d",line)
+						return "red"
+					}
+				//	var x = d3.select(this).attr("x")
+				//	var y = d3.select(this).attr("y")
+				//
+
+				})
+		    })
+
+				.on("mouseover",function(d){
+
+						var tx = parseFloat(d3.select(this).attr("x"))
+						var ty = parseFloat(d3.select(this).attr("yScale"))
+
+				 d3.select(this)
+				  .transition()
+					.attr("width", w/data.values.length+ 20)
+					.attr("opacity", 0.7)
+
+					  d3.select("#tooltip").classed("hidden", false);
+                    //NEW: get mouse x and y
+                        var mx = event.clientX
+                        var my = event.clientY
+                    //Set entire div to mouse x y
+
+						var tooltipDiv = d3.select("#tooltip")
+							.style("left", mx + "px")
+							.style("top", my + "px")
+					.style("background-color", "rgba(220, 220, 220, 0.8)")
+                    //add 2 sub divs, 1 for text 1 for image
+                    //first remove anything that might have been there before
+                      d3.selectAll("#textDiv").remove()
+                      d3.selectAll("#imageDiv").remove()
+                        var tooltipText = tooltipDiv.append("div").attr("id","textDiv")
+                        var tooltipImage = tooltipDiv.append("div").attr("id","imageDiv")
+
+                        //set the image part of the div to your image
+                        tooltipImage.append("img")
+	  	                            .attr('xlink:href', d.Image)
+	  	                            .attr('src', d.Image)
+                                  .attr('x',20)
+                                  .attr('y',20)
+	  	                            .attr('width', 300)
+	  	                            .attr('height', 300)
+
+                      //set the text part to your text
+						tooltipText
+							.text(d.Title)
+
+
+
+
+				})
+
+				.on("mouseout",function(d){
+
+				       d3.select(this)
+				              .transition()
+					          .attr("width", w/data.values.length)
+					          .attr("opacity", 1)
+
+					    d3.select("#tooltip").classed("hidden", true);
+
+                      d3.selectAll("#textDiv").remove()
+                      d3.selectAll("#imageDiv").remove()
+
+				})
+
+
+  }
+
+
+
+						// create title
+						svg.append("text")
+							 .attr("x", w1/2-50)
+						   .attr("y", -75)
+							 .attr("text-anchor", "middle")
+							 .attr("font-size", "28px")
+							 .attr("font-family", "Stylish")
+							 .attr("fill", "white")
+							 .text("What is the Material Usage Trend in Architecture?")
+
+						// add data source
+						svg.append("text")
+							 .attr("x", 1200)
+							 .attr("y", 360)
+							 .attr("text-anchor", "end")
+							 .attr("font-size", "11px")
+							 .attr("font-family", "helvetica")
+							 .attr("fill", "white")
+							 .text("Source: Archdaily (https://www.archdaily.com/)")
+
+						//write explanation
+						svg.append("text")
+							.attr("x", 1200)
+							.attr("y", 380)
+							.attr("text-anchor", "end")
+							.attr("font-size", "11px")
+							.attr("font-family", "sans-serif")
+							.attr("fill", "white")
+							.text("This is an overall timeline from year 2008 to 2012 showing all the projects in Archdaily")
+
+					svg.append("text")
+							 .attr("x", 1200)
+							 .attr("y", 400)
+							 .attr("text-anchor", "end")
+							 .attr("font-size", "11px")
+							 .attr("font-family", "sans-serif")
+							 .attr("fill", "white")
+							 .text("Hover on to see image of the project")
+				 svg.append("text")
+							 .attr("x", 1200)
+							 .attr("y", 420)
+							 .attr("text-anchor", "end")
+							 .attr("font-size", "11px")
+							 .attr("font-family", "sans-serif")
+							 .attr("fill", "white")
+							 .text("Click on each bar to see projects with the same architects")
+			 svg.append("text")
+			 							.attr("x", 1200)
+			 							.attr("y", 440)
+			 							.attr("text-anchor", "end")
+			 							.attr("font-size", "11px")
+			 							.attr("font-family", "sans-serif")
+			 							.attr("fill", "white")
+			 							.text("Click on grey bottons bellow to explore how material transfer in program category")
+				svg.append("text")
+												 .attr("x", 800)
+													.attr("y", 860)
+													.attr("text-anchor", "start")
+													.attr("font-size", "16px")
+													.attr("font-family", "sans-serif")
+													.attr("fill", "black")
+													.text("Material Usage Across Different Program")
+				 svg.append("text")
+			 		 		.attr("x", 800)
+			 		  	 .attr("y", 890)
+			 				 .attr("text-anchor", "start")
+			 				 .attr("font-size", "13px")
+			 				 .attr("font-family", "sans-serif")
+			 				 .attr("fill", "black")
+			 				 .text("The second part is a breakdown of the previous graph by program category.")
+				 svg.append("text")
+							 .attr("x", 800)
+							 .attr("y", 910)
+							 .attr("text-anchor", "start")
+					  	 .attr("font-size", "13px")
+				  	 	 .attr("font-family", "sans-serif")
+						 	 .attr("fill", "black")
+						 	 .text("The material usage across diffrent program is compared here.")
+		  	 svg.append("text")
+							 .attr("x", 820)
+							 .attr("y", 930)
+							 .attr("text-anchor", "start")
+							 .attr("font-size", "13px")
+							 .attr("font-family", "sans-serif")
+							 .attr("fill", "black")
+							 .text("A.Degree of tendency that materials combine with other material:")
+				 svg.append("text")
+							 .attr("x", 840)
+							 .attr("y", 950)
+							 .attr("text-anchor", "start")
+							 .attr("font-size", "13px")
+							 .attr("font-family", "sans-serif")
+							 .attr("fill", "black")
+							 .text("Glass > Wood, Steel > Concrete")
+							 svg.append("text")
+	 									 .attr("x", 820)
+	 									 .attr("y", 970)
+	 									 .attr("text-anchor", "start")
+	 									 .attr("font-size", "13px")
+	 									 .attr("font-family", "sans-serif")
+	 									 .attr("fill", "black")
+	 									 .text("B.Usage of ”Glass” and “Wood” has counter trend with “Concrete”")
+			 svg.append("text")
+										 .attr("x", 820)
+										 .attr("y", 990)
+										 .attr("text-anchor", "start")
+										 .attr("font-size", "13px")
+										 .attr("font-family", "sans-serif")
+										 .attr("fill", "black")
+										 .text("C.Renovation projects have the biggest percentage of concrete usage.")
+
+
+			 svg.append("text")
+										 			 .attr("x", 800)
+										 			 .attr("y", 1300)
+										 			 .attr("text-anchor", "start")
+										 			 .attr("font-size", "16px")
+										 			 .attr("font-family", "sans-serif")
+										 			 .attr("fill", "black")
+										 			 .text("Material Usage Within Each Program")
+
+				 svg.append("text")
+					  		.attr("x", 800)
+								.attr("y", 1330)
+								.attr("text-anchor", "start")
+								.attr("font-size", "13px")
+								.attr("font-family", "sans-serif")
+				  			.attr("fill", "black")
+								.text("The third part is a breakdown of material usage within each category.")
+				svg.append("text")
+							 .attr("x", 800)
+							 .attr("y", 1350)
+							 .attr("text-anchor", "start")
+							 .attr("font-size", "13px")
+							 .attr("font-family", "sans-serif")
+							 .attr("fill", "black")
+							 .text("Most popular materials in all program: ")
+							 svg.append("text")
+			 							 .attr("x", 820)
+			 							 .attr("y", 1370)
+			 							 .attr("text-anchor", "start")
+			 							 .attr("font-size", "13px")
+			 							 .attr("font-family", "sans-serif")
+			 							 .attr("fill", "black")
+			 							 .text("1.Concrete")
+							 svg.append("text")
+													 .attr("x", 820)
+													 .attr("y", 1390)
+													 .attr("text-anchor", "start")
+													 .attr("font-size", "13px")
+													 .attr("font-family", "sans-serif")
+													 .attr("fill", "black")
+													 .text("2.Glass Hybrid")
+							 svg.append("text")
+														 .attr("x", 820)
+														 .attr("y", 1410)
+														 .attr("text-anchor", "start")
+														 .attr("font-size", "13px")
+														 .attr("font-family", "sans-serif")
+														 .attr("fill", "black")
+														 .text("3.Wood & Wood Hybrid")
+										 svg.append("text")
+													 	 .attr("x", 820)
+													 	 .attr("y", 1430)
+													 	 .attr("text-anchor", "start")
+													 	 .attr("font-size", "13px")
+													 	 .attr("font-family", "sans-serif")
+													 	 .attr("fill", "black")
+													 	 .text("4.Steel")
+
+
+
+
+
+
+
+
+
+
+						// add legend concrete
+							svg.append("text")
+								 .attr("x", w-366)
+								 .attr("y", -50)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Concrete")
+
+						svg.append("rect")
+							 .attr("x", w-400)
+						   .attr("y", -60)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#FF8A47")
+
+						// add legend Glass
+							svg.append("text")
+								 .attr("x", w-375)
+								 .attr("y", -30)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Glass")
+
+						svg.append("rect")
+							 .attr("x", w-400)
+						   .attr("y", -40)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#8CEEEE")
+
+						// add legend Steel
+							svg.append("text")
+								 .attr("x", w-375)
+								 .attr("y", -10)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Steel")
+
+						svg.append("rect")
+							 .attr("x", w-400)
+						   .attr("y", -20)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#62BD96")
+
+						// add legend ConcreteHybrid
+							svg.append("text")
+								 .attr("x", w-275)
+								 .attr("y", -50)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Concrete Hybrid")
+
+						svg.append("rect")
+							 .attr("x", w-330)
+						   .attr("y", -60)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#F15839")
+
+						// add legend Glass hybrid
+							svg.append("text")
+								 .attr("x", w-280)
+								 .attr("y", -30)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Glass Hybrid")
+
+						svg.append("rect")
+							 .attr("x", w-330)
+						   .attr("y", -40)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#26bfbf")
+
+
+						// add legend Steel hybrid
+							svg.append("text")
+								 .attr("x", w-280)
+								 .attr("y", -10)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Steel Hybrid")
+
+						svg.append("rect")
+							 .attr("x", w-330)
+						   .attr("y", -20)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#00ff99")
+
+
+						// add legend Wood
+							svg.append("text")
+								 .attr("x", w-190)
+								 .attr("y", -50)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Wood")
+
+						svg.append("rect")
+							 .attr("x", w-220)
+						   .attr("y", -60)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#FC6170")
+
+
+						// add legend Wood
+							svg.append("text")
+								 .attr("x", w-190)
+								 .attr("y", -30)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Brick")
+
+						svg.append("rect")
+							 .attr("x", w-220)
+						   .attr("y", -40)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#FFD747")
+
+
+						// add legend Stone
+							svg.append("text")
+								 .attr("x", w-190)
+								 .attr("y", -10)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Stone")
+
+						svg.append("rect")
+							 .attr("x", w-220)
+						   .attr("y", -20)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#FFFDA2")
+
+						// add legend WoodHybrid
+							svg.append("text")
+								 .attr("x", w-105)
+								 .attr("y", -50)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Wood Hybrid")
+
+						svg.append("rect")
+							 .attr("x", w-150)
+						   .attr("y", -60)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#ff9999")
+
+						// add legend Plastic
+							svg.append("text")
+								 .attr("x", w-120)
+								 .attr("y", -30)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Plastic")
+
+						svg.append("rect")
+							 .attr("x", w-150)
+						   .attr("y", -40)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#cc3333")
+
+						// add legend Stone Hybrid
+							svg.append("text")
+								 .attr("x", w-105)
+								 .attr("y", -10)
+								 .attr("text-anchor", "middle")
+								 .attr("font-size", "10px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "white")
+								 .text("Stone Hybrid")
+
+						svg.append("rect")
+							 .attr("x", w-150)
+						   .attr("y", -20)
+								 .attr('width',10)
+								 .attr('height',10)
+							 .attr("fill", "#ffff00")
+
+
+
+					     // Houses title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 1290)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Houses”")
+
+					     // Offices title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 1630)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Offices”")
+
+					     // Apartments title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 1970)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Apartments”")
+
+					     // Renovation title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 2310)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Renovation”")
+
+					     // Museum title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 2650)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Museum”")
+
+					     // Institutional Buildings title
+							svg.append("text")
+								 .attr("x", 80)
+								 .attr("y", 2990)
+								 .attr("text-anchor", "start")
+								 .attr("font-size", "15px")
+								 .attr("font-family", "sans-serif")
+								 .attr("fill", "black")
+								 .text("Material Usage Within “Others”")
+
+						  // Houses Title in middlechart
+								 svg.append("text")
+ 									 .attr("x", 20)
+ 									 .attr("y", 865)
+ 									 .attr("text-anchor", "middle")
+ 									 .attr("font-size", "15px")
+ 									 .attr("font-family", "sans-serif")
+ 									 .attr("fill", "black")
+ 									 .text("Houses")
+
+               // Offices Title in middlechart
+							  svg.append("text")
+									 .attr("x", 20)
+									 .attr("y", 915)
+									 .attr("text-anchor", "middle")
+									 .attr("font-size", "15px")
+									 .attr("font-family", "sans-serif")
+									 .attr("fill", "black")
+									 .text("Offices")
+             // Apartment Title in middlechart
+					  	 svg.append("text")
+							  	.attr("x", 20)
+						  		.attr("y", 965)
+							  	.attr("text-anchor", "middle")
+						  		.attr("font-size", "15px")
+							  	.attr("font-family", "sans-serif")
+							  	.attr("fill", "black")
+							  	.text("Apartments")
+		        // Renovation Title in middlechart
+					  	svg.append("text")
+						  	 .attr("x", 20)
+							   .attr("y", 1015)
+							   .attr("text-anchor", "middle")
+							   .attr("font-size", "15px")
+						  	 .attr("font-family", "sans-serif")
+						  	 .attr("fill", "black")
+							   .text("Renovation")
+           // Museum Title in middlechart
+				    	svg.append("text")
+					    	 .attr("x", 20)
+				    		 .attr("y", 1065)
+					    	 .attr("text-anchor", "middle")
+					    	 .attr("font-size", "15px")
+					    	 .attr("font-family", "sans-serif")
+					     	 .attr("fill", "black")
+					    	 .text("Museum")
+        // Others Title in middlechart
+							 svg.append("text")
+				 				 .attr("x", 20)
+				 				 .attr("y", 1115)
+				 				 .attr("text-anchor", "middle")
+				 				 .attr("font-size", "15px")
+				 				 .attr("font-family", "sans-serif")
+				 				 .attr("fill", "black")
+				 				 .text("Others")
+
+
+
+
+
+
+
+
+
+	   //group data by category
+				d3.csv("Archdaily_Clean_0425.csv")
+				.then(function(data){
+			var dataByCategory = d3.nest()
+				.key(function(d) { return d.Category; })
+				.entries(data);
+
+                console.log(dataByCategory)
+
+				for(var i in dataByCategory){
+
+				   	drawChart2(dataByCategory[i],i);
+
+				}
+						})
+
+        function drawaxis(y,svg){
+					var yAxis = d3.scaleBand()
+												.domain(["Brick","Concrete","Concrete Hybrid","Glass","Glass Hybrid","Steel","Steel Hybrid","Stone","Stone Hybrid","Wood","Wood Hybrid"])
+												.range([0, (h-1870)/6])
+
+
+					 svg.append("g")
+						 .call(d3.axisLeft(yAxis))
+						 .style("color", "black")
+						 .attr("transform", "translate (0,"+y+")")
+
+
+
+
+
+
+
+
+
+				}
+				function drawChart2(data,order){
+
+
+
+					var xScale = d3.scaleBand()
+												 .domain([0,data.key.length])
+												 .range([0, w])
+												 .padding([0.4])
+
+
+					var yScale = d3.scaleLinear()
+												 .domain([0, 10])
+										 		.range([(h-700)/7, 0])
+
+
+       //create y Axis
+			   // var yAxis = d3.scaleBand()
+					// 						 .domain(["Brick","Concrete","Concrete Hybrid","Glass","Glass Hybrid","Steel","Steel Hybrid","Stone","Stone Hybrid","Wood","Wood Hybrid"])
+					// 					   .range([0, (h-1870)/6])
+				 //
+				 //
+			  	// svg.append("g")
+					// 	.call(d3.axisLeft(yAxis))
+					//   .style("color", "black")
+         //    .attr("transform", "translate(0, 1300)")
+           // drawaxis(1300, svg)
+					 // drawaxis(1630, svg)
+
+
+
+          var yScaleforeach =d3.scaleBand()
+													 .domain(["Brick","Concrete","ConcreteHybrid","Fabric","Glass","GlassHybrid","Plastic","Steel","SteelHybrid","Stone","StoneHybrid","Wood","WoodHybrid"])
+												   .range([0, 300])
+
+													 d3.select("#Houses").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Houses"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																 return i*10
+														 })
+														 .attr("y",function(d,i){
+															 return 460
+														 })
+													 })
+
+													 d3.select("#Offices").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Offices"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																return i*10
+														})
+														 .attr("y",function(d,i){
+															 return 490
+														 })
+													 })
+
+													 d3.select("#Apartments").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Apartments"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																return i*10
+														})
+														 .attr("y",function(d,i){
+															 return 540
+														 })
+													 })
+
+													 d3.select("#Renovation").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Renovation"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																return i*10
+														})
+														 .attr("y",function(d,i){
+															 return 590
+														 })
+													 })
+
+													 d3.select("#Museum").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Museum"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																return i*10
+														})
+														 .attr("y",function(d,i){
+															 return 640
+														 })
+													 })
+
+													 d3.select("#Others").on("click",function(){
+														 d3.selectAll("rect"+".topchart").attr("opacity",0)
+														 d3.selectAll(".Others"+".topChart")
+														 .attr("opacity",1)
+														 .transition()
+														 .duration(800)
+														 .attr("x",function(d,i){
+															 return i*2
+														 })
+														 .delay(function(d,i){
+																return i*10
+														})
+														 .attr("y",function(d,i){
+															 return 690
+														 })
+													 })
+
+
+													 					svg.append("g")
+													 						.selectAll("g")
+													 						.data(data.values)
+													 						.enter()
+													 						.append("g")
+													 						.attr("fill", function(d){
+													 							return colorByProduct[d.Product]
+
+													 						})
+													 						.append("rect")
+													 						.attr("class",function(d){
+													 							// console.log(d)
+													 							return d.Category+" middlechart"
+													 						})
+													 						.attr("x",function(d,i){
+
+													 						  return i*500/data.values.length
+
+													 						})
+													 						.attr("y",function(d,i){
+													 						  return order*50
+													 				 	  })
+													 					 	.attr("width",500/data.values.length)
+													 						.attr("height",20)
+													 						.attr("transform", "translate(80, 850)")
+
+
+					// svg.append("g")
+					// 		.call(d3.axisLeft(yScale))
+					// 	 .style("color", "black")
+
+                    //NEW: subgroup of category by Material, then loop as you did before but for each material
+                    var groupCategoryByMaterial = d3.nest()
+        				.key(function(d) { return d.Product; })
+        				.entries(data.values);
+
+
+                        var totalProjectsNumber = data.values.length
+                        console.log(totalProjectsNumber)
+
+                        for(var m in groupCategoryByMaterial){
+                            var materialOrder = m
+                            var materialData = groupCategoryByMaterial[m]
+                            drawMaterial(order, materialData,materialOrder,yScaleforeach,totalProjectsNumber)
+                        }
+
+                    }
+                        function drawMaterial(categoryOrder, data,materialOrder,yScaleforeach,totalProjectsNumber){
+
+
+
+						 //
+							// 						svg.append("g")
+						 // 							 .selectAll("g")
+						 // 							 .data(data.values)
+						 // 							 .enter()
+						 // 							 .append("g")
+						 // 							 .attr("fill", function(d){
+						 // 								 return colorByProduct[d.Product]
+						 //
+						 // 							 })
+						 // 							 .append("rect")
+						 // 							 .attr("class",function(d){
+						 // 								 // console.log(d)
+						 // 								 return d.Category
+						 // 							 })
+						 // 							 .attr("x",function(d,i){
+						 // 											 //NEW: these bars must be the same width across materials to make a comparison between materials.
+						 // 								 return i*1500/totalProjectsNumber
+						 // //    						  return i*500/data.values.length
+						 //
+						 // 							 })
+						 // 							 .attr("y",function(d,i){
+						 // 															 //NEW: I put y based on bar height at 22 so that the bars are visible on same page.
+						 // 															 //TODO: you may have to adjust for number of projects by using totalProjectsNumber somewhere. you cannot make comparisons between the larger categories otherwise.
+						 // 								 return categoryOrder*340
+						 //
+						 // 								 //return yScaleforeach(d.Product)+order*340
+						 // 							 })
+						 // 							 .attr("width",1500/totalProjectsNumber)
+						 // 							 .attr("height",20)
+						 // 							 .attr("transform", "translate(0, 750)")
+						 //
+            console.log(data.key)
+              svg.append("text")
+                 .text(data.key)
+								 .attr("x",70)
+								 .attr("y", materialOrder*22+categoryOrder*340)
+								 .attr("transform", "translate(0, 1315)")
+								 .attr("text-anchor","end")
+								 .attr("font-size", "13px")
+
+    					svg.append("g")
+    						.selectAll("g")
+    						.data(data.values)
+    						.enter()
+    						.append("g")
+    						.attr("fill", function(d){
+    							return colorByProduct[d.Product]
+
+    						})
+    						.append("rect")
+    						.attr("class",function(d){
+    							// console.log(d)
+    							return d.Category+"bottomchart"
+    						})
+    						.attr("x",function(d,i){
+                        //NEW: these bars must be the same width across materials to make a comparison between materials.
+    						  return 80+i*2
+//    						  return i*500/data.values.length
+
+    						})
+    						.attr("y",function(d,i){
+                                //NEW: I put y based on bar height at 22 so that the bars are visible on same page.
+                                //TODO: you may have to adjust for number of projects by using totalProjectsNumber somewhere. you cannot make comparisons between the larger categories otherwise.
+    						  return materialOrder*22+categoryOrder*340
+
+    						  //return yScaleforeach(d.Product)+order*340
+    				 	  })
+    					 	.attr("width",20)
+    						.attr("height",20)
+    						.attr("transform", "translate(0, 1300)")
+                        }
+
+
+
+        </script>
+	</body>
+</html>
